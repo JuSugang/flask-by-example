@@ -3,6 +3,7 @@ import requests
 import operator
 import re
 import nltk
+import json
 from flask import jsonify, Flask, render_template, request
 from flask_sqlalchemy import SQLAlchemy
 from stop_words import stops
@@ -97,6 +98,19 @@ def get_results(job_key):
     else:
         return "Nay!", 202
 
+@app.route("/start", methods=['POST'])
+def get_counts():
+    # get url
+    data = json.loads(request.data.decode())
+    url = data["url"]
+    if 'http://' not in url[:7]:
+        url = 'http://' + url
+    # start job
+    job = q.enqueue_call( 
+        func="app.count_and_save_words", args=(url,), result_ttl=5000
+    )
+    # return created job id
+    return job.get_id()
 
 if __name__ == '__main__':
     app.run()
