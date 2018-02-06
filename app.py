@@ -59,8 +59,11 @@ def count_and_save_words(url):
             result_all=raw_word_count,
             result_no_stop_words=no_stop_words_count
         )
+        print(db)
+        print(db.session)
         db.session.add(result)
         db.session.commit()
+        print("db added !!")
         return result.id
     except:
         errors.append("Unable to add item to database.")
